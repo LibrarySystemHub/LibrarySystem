@@ -12,7 +12,7 @@ public class Book {
 		this.ISBN = ISBN;
 	}
 	
-	String getTitle() {
+	public String getTitle() {
 		return title;
 	}
 	
