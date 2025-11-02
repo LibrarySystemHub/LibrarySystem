@@ -14,6 +14,7 @@ public class BookManager {
 	        books.add(book);
 	        System.out.println("Book added: " + book.getTitle());
 	    }
+	 
 	 public void listBooks() {
 	        if (books.isEmpty()) {
 	            System.out.println("No books available.");
@@ -42,5 +43,13 @@ public class BookManager {
 		    } 
 	 }
 	 
-	
+	 
+	 public Book findBookByISBN(String isbn) {
+	     for (Book book : books) {
+	         if (book.getISBN().equalsIgnoreCase(isbn)) {
+	             return book;
+	         }
+	     }
+	     return null;
+	 }
 }
