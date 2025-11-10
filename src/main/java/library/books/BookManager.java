@@ -26,7 +26,12 @@ public class BookManager {
 	        }
 	  }
 	 
-	 public void searchBook(String keyword) {
+	 public boolean searchBook(String keyword) {
+		 if (books.isEmpty()) { 
+		        System.out.println("No books available in the library.");
+		        return false;
+		    }
+		 
 		 boolean found = false;
 		 System.out.println("Search results for: \"" + keyword + "\"");
 		 for (Book book : books) {
@@ -41,6 +46,8 @@ public class BookManager {
 		 if (!found) {
 		        System.out.println("No matching books found.");
 		    } 
+		    return found;
+
 	 }
 	 
 	 
