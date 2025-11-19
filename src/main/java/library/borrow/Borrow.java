@@ -39,6 +39,10 @@ public class Borrow {
         this.returned = returned;
     }
 
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
     public boolean isOverdue() {
         return !returned && LocalDate.now().isAfter(dueDate);
     }
@@ -54,4 +58,3 @@ public class Borrow {
                 '}';
     }
 }
-
