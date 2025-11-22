@@ -8,6 +8,7 @@ import library.books.Book;
 import library.users.User;
 
 public class BorrowManager {
+
     private ArrayList<Borrow> borrows;
 
     public BorrowManager() {
@@ -16,17 +17,16 @@ public class BorrowManager {
 
     public void borrowBook(Book book, User user) {
         if (!user.canBorrow()) {
-            System.out.println("⚠️ You have unpaid fines! Pay before borrowing.");
+            System.out.println("You have unpaid fines! Pay before borrowing.");
             return;
         }
 
         Borrow newBorrow = new Borrow(book, user);
         borrows.add(newBorrow);
-        System.out.println("✅ Book borrowed successfully! Due on: " + newBorrow.getDueDate());
+        System.out.println("Book borrowed successfully. Due on: " + newBorrow.getDueDate());
     }
 
     public void checkOverdueBooks() {
-        System.out.println("\n📅 Checking overdue books...");
         boolean found = false;
 
         for (Borrow b : borrows) {
@@ -35,13 +35,13 @@ public class BorrowManager {
                 long daysLate = ChronoUnit.DAYS.between(b.getDueDate(), java.time.LocalDate.now());
                 double fine = daysLate * 1.0;
                 b.getUser().addFine(fine);
-                System.out.println("❌ Overdue Book: " + b.getBook().getTitle() +
-                        " | Days late: " + daysLate +
-                        " | Fine added: " + fine + " NIS");
+                System.out.println("Overdue: " + b.getBook().getTitle() +
+                        " | Late: " + daysLate +
+                        " | Fine: " + fine);
             }
         }
 
-        if (!found) System.out.println("✅ No overdue books!");
+        if (!found) System.out.println("No overdue books.");
     }
 
     public void payFine(User user, double amount) {
@@ -54,7 +54,6 @@ public class BorrowManager {
             return;
         }
 
-        System.out.println("📚 Current Borrows:");
         for (Borrow b : borrows) {
             System.out.println(b);
         }
@@ -62,5 +61,29 @@ public class BorrowManager {
 
     public List<Borrow> getBorrows() {
         return borrows;
+    }
+
+    public List<User> getAllUsersWithOverdues() {
+        List<User> users = new ArrayList<>();
+
+        for (Borrow b : borrows) {
+            if (b.isOverdue() && !users.contains(b.getUser())) {
+                users.add(b.getUser());
+            }
+        }
+
+        return users;
+    }
+
+    public int countOverduesForUser(User user) {
+        int count = 0;
+
+        for (Borrow b : borrows) {
+            if (b.getUser().equals(user) && b.isOverdue()) {
+                count++;
+            }
+        }
+
+        return count;
     }
 }

@@ -81,7 +81,7 @@ public class Main {
                     if (bookToBorrow != null) {
                         borrowManager.borrowBook(bookToBorrow, user);
                     } else {
-                        System.out.println("❌ Book not found!");
+                        System.out.println(" Book not found!");
                     }
                     break;
 
@@ -101,11 +101,11 @@ public class Main {
 
                 case "10":
                     exit = true;
-                    System.out.println("👋 Goodbye!");
+                    System.out.println(" Goodbye!");
                     break;
 
                 default:
-                    System.out.println("❌ Invalid choice!");
+                    System.out.println(" Invalid choice!");
             }
         }
 
