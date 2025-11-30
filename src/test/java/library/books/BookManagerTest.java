@@ -47,6 +47,7 @@ class BookManagerTest {
 	    assertTrue(manager.searchBook("Robert"));
 	}
 	
+	@Test
 	void testSearchBookByISBN() {
 	    manager.addBook(new Book("Clean Code", "Robert Martin", "9780132350884"));
 	    assertTrue(manager.searchBook("9780132350884"), "Book should be found by ISBN");

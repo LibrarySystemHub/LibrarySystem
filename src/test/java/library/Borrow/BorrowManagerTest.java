@@ -70,6 +70,17 @@ class BorrowManagerTest {
         int after = borrows.size();
         assertEquals(before, after);
     }
+    @Test
+    void testBorrowBlockedWhenUserHasOverdueBorrow() {
+    	borrowManager.borrowBook(book, user);
+        Borrow existingBorrow = borrowManager.getBorrows().get(0);
+        existingBorrow.setDueDate(LocalDate.now().minusDays(5));
+        int before = borrowManager.getBorrows().size();
+        Book newBook = new Book("Java", "Alaa", "222");
+        borrowManager.borrowBook(newBook, user);
+        int after = borrowManager.getBorrows().size();
+        assertEquals(before, after);
+    }
 
     @Test
     void testCheckOverdueBooksAddsFineForOverdueBorrow() {

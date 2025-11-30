@@ -41,7 +41,7 @@ class AdminTest {
 	}
 	@Test
 	void testLogout() {
-		 admin.login("admin", "1234");
+		 admin.login("alaa", "1234");
 		 admin.logout();
 		 assertFalse(admin.isLoggedIn());
 

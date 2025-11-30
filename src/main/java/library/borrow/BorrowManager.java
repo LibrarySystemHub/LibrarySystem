@@ -20,6 +20,12 @@ public class BorrowManager {
             System.out.println("You have unpaid fines! Pay before borrowing.");
             return;
         }
+        for (Borrow b : borrows) {
+            if (b.getUser().equals(user) && b.isOverdue()) {
+            	System.out.println("Cannot borrow: User has overdue books.");
+            	return;
+            }
+        }
 
         Borrow newBorrow = new Borrow(book, user);
         borrows.add(newBorrow);
