@@ -1,47 +1,41 @@
 package library;
 
 import java.util.Scanner;
+
 import library.admin.Admin;
-import library.books.Book;
-import library.books.BookManager;
+import library.media.Book;
+import library.media.CD;
+import library.media.Media;
+import library.media.MediaManager;
 import library.borrow.BorrowManager;
 import library.users.User;
 
 public class Main {
-
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
-        BookManager manager = new BookManager();
+
+        MediaManager manager = new MediaManager();
         BorrowManager borrowManager = new BorrowManager();
+
         Admin admin = new Admin("alaa", "1234");
-        User user = new User("jana"); // المستخدم الحالي
+        User user = new User("jana");
+
         boolean exit = false;
 
-        System.out.println("=== Welcome to the Library System ===");
-
         while (!exit) {
-            System.out.println("\nChoose an option:");
-            System.out.println("1. Admin Login");
-            System.out.println("2. Admin Logout");
-            System.out.println("3. Add Book (Admin Only)");
-            System.out.println("4. List All Books");
-            System.out.println("5. Search Book (User)");
-            System.out.println("6. Borrow Book");
-            System.out.println("7. Check Overdue Books");
-            System.out.println("8. Pay Fine");
-            System.out.println("9. List All Borrows");
-            System.out.println("10. Exit");
-
+            System.out.println("\n1. Admin Login\n2. Admin Logout\n3. Add Book\n4. Add CD\n5. List Media\n6. Search Media\n7. Borrow Media\n8. Check Overdue\n9. Pay Fine\n10. Exit");
             System.out.print("Your choice: ");
             String choice = sc.nextLine();
 
             switch (choice) {
+
                 case "1":
-                    System.out.print("Enter username: ");
-                    String username = sc.nextLine();
-                    System.out.print("Enter password: ");
-                    String password = sc.nextLine();
-                    admin.login(username, password);
+                    System.out.print("Username: ");
+                    String u = sc.nextLine();
+                    System.out.print("Password: ");
+                    String p = sc.nextLine();
+                    admin.login(u, p);
                     break;
 
                 case "2":
@@ -50,62 +44,61 @@ public class Main {
 
                 case "3":
                     if (!admin.isLoggedIn()) {
-                        System.out.println("⚠️ You must be logged in as Admin to add books.");
+                        System.out.println("Admin only.");
                     } else {
-                        System.out.print("Enter book title: ");
-                        String title = sc.nextLine();
-                        System.out.print("Enter book author: ");
-                        String author = sc.nextLine();
-                        System.out.print("Enter book ISBN: ");
+                        System.out.print("Title: ");
+                        String t = sc.nextLine();
+                        System.out.print("Author: ");
+                        String a = sc.nextLine();
+                        System.out.print("ISBN: ");
                         String isbn = sc.nextLine();
-
-                        Book book = new Book(title, author, isbn);
-                        manager.addBook(book);
+                        manager.addMedia(new Book(t, a, isbn));
                     }
                     break;
 
                 case "4":
-                    manager.listBooks();
-                    break;
-
-                case "5":
-                    System.out.print("Enter keyword to search (title/author/ISBN): ");
-                    String keyword = sc.nextLine();
-                    manager.searchBook(keyword);
-                    break;
-
-                case "6":
-                    System.out.print("Enter ISBN to borrow: ");
-                    String isbn = sc.nextLine();
-                    Book bookToBorrow = manager.findBookByISBN(isbn);
-                    if (bookToBorrow != null) {
-                        borrowManager.borrowBook(bookToBorrow, user);
+                    if (!admin.isLoggedIn()) {
+                        System.out.println("Admin only.");
                     } else {
-                        System.out.println(" Book not found!");
+                        System.out.print("CD title: ");
+                        String ct = sc.nextLine();
+                        System.out.print("Serial: ");
+                        String cs = sc.nextLine();
+                        manager.addMedia(new CD(ct, cs));
                     }
                     break;
 
+                case "5":
+                    manager.listMedia();
+                    break;
+
+                case "6":
+                    System.out.print("Keyword: ");
+                    manager.searchMedia(sc.nextLine());
+                    break;
+
                 case "7":
-                    borrowManager.checkOverdueBooks();
+                    System.out.print("Enter media ID: ");
+                    Media m = manager.findMediaById(sc.nextLine());
+                    if (m != null) {
+                        borrowManager.borrowMedia(m, user);
+                    } else {
+                        System.out.println("Not found.");
+                    }
                     break;
 
                 case "8":
-                    System.out.print("Enter amount to pay: ");
-                    double amount = Double.parseDouble(sc.nextLine());
-                    borrowManager.payFine(user, amount);
+                    borrowManager.checkOverdue();
                     break;
 
                 case "9":
-                    borrowManager.listBorrows();
+                    System.out.print("Amount: ");
+                    user.payFine(Double.parseDouble(sc.nextLine()));
                     break;
 
                 case "10":
                     exit = true;
-                    System.out.println(" Goodbye!");
                     break;
-
-                default:
-                    System.out.println(" Invalid choice!");
             }
         }
 

@@ -1,61 +1,58 @@
 package library.borrow;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import library.books.Book;
+import library.fines.BookFineStrategy;
+import library.fines.CDFineStrategy;
+import library.fines.FineStrategy;
+import library.media.Media;
 import library.users.User;
 
 public class BorrowManager {
 
-    private ArrayList<Borrow> borrows;
+    private List<Borrow> borrows;
 
     public BorrowManager() {
         borrows = new ArrayList<>();
     }
-
-    public void borrowBook(Book book, User user) {
+ 
+    public void borrowMedia(Media media, User user) {
         if (!user.canBorrow()) {
-            System.out.println("You have unpaid fines! Pay before borrowing.");
+            System.out.println("User has unpaid fines. Cannot borrow.");
             return;
         }
-
-        Borrow newBorrow = new Borrow(book, user);
-        borrows.add(newBorrow);
-        System.out.println("Book borrowed successfully. Due on: " + newBorrow.getDueDate());
+        Borrow b = new Borrow(media, user);
+        borrows.add(b);
+        System.out.println(media.getTitle() + " borrowed. Due: " +
+                LocalDate.now().plusDays(media.getBorrowDays()));
     }
 
-    public void checkOverdueBooks() {
-        boolean found = false;
-
+    public void checkOverdue() {
         for (Borrow b : borrows) {
             if (b.isOverdue()) {
-                found = true;
-                long daysLate = ChronoUnit.DAYS.between(b.getDueDate(), java.time.LocalDate.now());
-                double fine = daysLate * 1.0;
+
+                long daysLate = ChronoUnit.DAYS.between(
+                        b.getDueDate(),
+                        LocalDate.now()
+                );
+
+                FineStrategy strategy;
+                if ("CD".equals(b.getMedia().getType())) {
+                    strategy = new CDFineStrategy();
+                } else {
+                    strategy = new BookFineStrategy();
+                }
+
+                double fine = strategy.calculateFine(daysLate);
                 b.getUser().addFine(fine);
-                System.out.println("Overdue: " + b.getBook().getTitle() +
-                        " | Late: " + daysLate +
-                        " | Fine: " + fine);
+
+                System.out.println("Overdue: " + b.getMedia().getTitle()
+                        + " | Days late: " + daysLate
+                        + " | Fine added: " + fine);
             }
-        }
-
-        if (!found) System.out.println("No overdue books.");
-    }
-
-    public void payFine(User user, double amount) {
-        user.payFine(amount);
-    }
-
-    public void listBorrows() {
-        if (borrows.isEmpty()) {
-            System.out.println("No borrowed books yet.");
-            return;
-        }
-
-        for (Borrow b : borrows) {
-            System.out.println(b);
         }
     }
 
@@ -63,27 +60,38 @@ public class BorrowManager {
         return borrows;
     }
 
-    public List<User> getAllUsersWithOverdues() {
-        List<User> users = new ArrayList<>();
-
+    public void listBorrows() {
+        if (borrows.isEmpty()) {
+            System.out.println("No borrows yet.");
+            return;
+        }
         for (Borrow b : borrows) {
-            if (b.isOverdue() && !users.contains(b.getUser())) {
-                users.add(b.getUser());
+            System.out.println(b.getMedia().getTitle() + " borrowed by " + b.getUser().getName());
+        }
+    }
+
+    public void payFine(User user, double amount) {
+        user.payFine(amount);
+    }
+
+   
+    public List<User> getAllUsersWithOverdues() {
+        List<User> result = new ArrayList<>();
+        for (Borrow b : borrows) {
+            if (b.isOverdue() && !result.contains(b.getUser())) {
+                result.add(b.getUser());
             }
         }
-
-        return users;
+        return result;
     }
 
     public int countOverduesForUser(User user) {
         int count = 0;
-
         for (Borrow b : borrows) {
             if (b.getUser().equals(user) && b.isOverdue()) {
                 count++;
             }
         }
-
         return count;
     }
 }
