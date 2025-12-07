@@ -21,7 +21,7 @@ class AdminTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		admin = new Admin("alaa", "1234");
+		admin = new Admin("Admin", "1234");
 	}
 
 	@AfterEach
@@ -30,18 +30,18 @@ class AdminTest {
 
 	@Test
 	void testLoginWithValidCredentials() {
-		admin.login("alaa", "1234");
+		admin.login("Admin", "1234");
 		assertTrue(admin.isLoggedIn());
 
 	}
 	@Test
 	void testLoginWithInvalidCredentials() {
-		 admin.login("alaa", "124");
+		 admin.login("Admin", "124");
 		 assertFalse(admin.isLoggedIn());
 	}
 	@Test
 	void testLogout() {
-		 admin.login("alaa", "1234");
+		 admin.login("Admin", "1234");
 		 admin.logout();
 		 assertFalse(admin.isLoggedIn());
 

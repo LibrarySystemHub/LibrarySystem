@@ -33,7 +33,7 @@ class BorrowManagerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        borrowManager = new BorrowManager();
+        borrowManager = new BorrowManager(true);
         user = new User("jana");
         book = new Book("Clean Code", "Robert Martin", "9780132350884");
     }

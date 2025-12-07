@@ -1,18 +1,28 @@
 package library.borrow;
 
-import java.time.temporal.ChronoUnit;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import library.StorageManager;
 import library.books.Book;
 import library.users.User;
 
 public class BorrowManager {
 
     private ArrayList<Borrow> borrows;
+    private List<User> users;
+    private boolean testMode;
 
-    public BorrowManager() {
+    public BorrowManager(List<Book> books, List<User> users) {
+        borrows = StorageManager.loadBorrows(books, users); 
+        this.users = users;
+        testMode = false;
+    }
+    public BorrowManager(boolean testMode) {
         borrows = new ArrayList<>();
+        this.testMode = testMode;
     }
 
     public void borrowBook(Book book, User user) {
@@ -29,7 +39,18 @@ public class BorrowManager {
 
         Borrow newBorrow = new Borrow(book, user);
         borrows.add(newBorrow);
+        if (!testMode) {
+            StorageManager.saveBorrows(borrows);
+        }
         System.out.println("Book borrowed successfully. Due on: " + newBorrow.getDueDate());
+    }
+    public void returnBook(Borrow borrow) {
+        borrow.setReturned(true);
+        
+        if (!testMode) {
+            StorageManager.saveBorrows(borrows);
+        }
+        System.out.println("Book returned successfully: " + borrow.getBook().getTitle());
     }
 
     public void checkOverdueBooks() {
@@ -38,31 +59,45 @@ public class BorrowManager {
         for (Borrow b : borrows) {
             if (b.isOverdue()) {
                 found = true;
-                long daysLate = ChronoUnit.DAYS.between(b.getDueDate(), java.time.LocalDate.now());
-                double fine = daysLate * 1.0;
-                b.getUser().addFine(fine);
-                System.out.println("Overdue: " + b.getBook().getTitle() +
-                        " | Late: " + daysLate +
-                        " | Fine: " + fine);
+                double fineAddedToday = 0;
+                LocalDate today = LocalDate.now();
+                if (b.getLastFineChecked().isBefore(today)) {
+                    fineAddedToday = b.calculateFine();
+                }
+                System.out.println("User: " + b.getUser().getName() +
+                        " | Overdue: " + b.getBook().getTitle() +
+                        " | Fine added today: " + fineAddedToday +
+                        " | Total fine: " + b.getUser().getFineBalance());
+               
             }
         }
 
         if (!found) System.out.println("No overdue books.");
+        if (!testMode) {
+        	 StorageManager.saveUsers(users);
+            StorageManager.saveBorrows(borrows);
+        }
     }
 
     public void payFine(User user, double amount) {
         user.payFine(amount);
+        if (!testMode) {
+        	
+        	StorageManager.saveUsers(users);
+        }
     }
 
-    public void listBorrows() {
-        if (borrows.isEmpty()) {
-            System.out.println("No borrowed books yet.");
-            return;
-        }
-
-        for (Borrow b : borrows) {
-            System.out.println(b);
-        }
+    public void listBorrows(User user) {
+    	  boolean found = false;
+    	    for (Borrow b : borrows) {
+    	        if (b.getUser().equals(user)) {
+    	            System.out.println(b);
+    	            found = true;
+    	        }
+    	    }
+    	    if (!found) {
+    	        System.out.println("No borrowed books yet.");
+    	    }
     }
 
     public List<Borrow> getBorrows() {

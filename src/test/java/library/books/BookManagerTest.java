@@ -22,7 +22,7 @@ class BookManagerTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		manager = new BookManager();
+		manager = new BookManager(true);
 	}
 
 	@AfterEach

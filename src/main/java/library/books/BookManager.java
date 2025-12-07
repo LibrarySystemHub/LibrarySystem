@@ -1,20 +1,32 @@
 package library.books;
 
 import java.util.ArrayList;
+import library.StorageManager;
 
 public class BookManager {
 
 	 private ArrayList<Book> books;
+	 private boolean testMode;
 	 
 	 public BookManager() {
+		 books = StorageManager.loadBooks();
+	     testMode = false;
+	 }
+	 public BookManager(boolean testMode) {
 	        books = new ArrayList<>();
+	        this.testMode = testMode;
 	    }
 	 
 	 public void addBook(Book book) {
 	        books.add(book);
+	        if (!testMode) {
+	            StorageManager.saveBooks(books);
+	        }
+	       
 	        System.out.println("Book added: " + book.getTitle());
 	    }
 	 
+
 	 public void listBooks() {
 	        if (books.isEmpty()) {
 	            System.out.println("No books available.");
@@ -59,4 +71,7 @@ public class BookManager {
 	     }
 	     return null;
 	 }
+	 public ArrayList<Book> getBooks() {
+		    return books;
+		}
 }

@@ -16,11 +16,11 @@ public class Book {
 		return title;
 	}
 	
-	String getAuthor() {
+	public String getAuthor() {
 		return author;
 	}
 
-	String getISBN() {
+	public String getISBN() {
 		return ISBN;
 	}
 	@Override
