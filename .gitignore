@@ -23,4 +23,6 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+.env
+hs_err_pid*.log
 >>>>>>> branch 'main' of https://github.com/Alaa726/Library-System.git

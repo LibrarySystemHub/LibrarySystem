@@ -19,14 +19,14 @@ public class BorrowManager {
         borrows = new ArrayList<>();
     }
 
-
     public void borrowMedia(Media media, User user) {
+
         if (!user.canBorrow()) {
             System.out.println("User has unpaid fines. Cannot borrow.");
             return;
         }
 
-       
+   
         for (Borrow b : borrows) {
             if (b.getUser().equals(user) && b.isOverdue()) {
                 System.out.println("Cannot borrow: user has overdue items.");
@@ -40,33 +40,52 @@ public class BorrowManager {
         System.out.println(media.getTitle() + " borrowed. Due: " + newBorrow.getDueDate());
     }
 
-
     public void checkOverdue() {
+
         for (Borrow b : borrows) {
+
             if (b.isOverdue()) {
 
                 long lateDays = ChronoUnit.DAYS.between(b.getDueDate(), LocalDate.now());
 
                 FineStrategy strategy;
-                if ("CD".equals(b.getMedia().getType())) {
-                    strategy = new CDFineStrategy(); // 20 NIS/day
+
+                if (b.getMedia().getType().equals("CD")) {
+                    strategy = new CDFineStrategy();
                 } else {
-                    strategy = new BookFineStrategy(); // 10 NIS/day
+                    strategy = new BookFineStrategy();
                 }
 
                 double fine = strategy.calculateFine(lateDays);
                 b.getUser().addFine(fine);
 
-                System.out.println("Overdue: " + b.getMedia().getTitle()
-                        + " | Late days: " + lateDays
-                        + " | Fine added: " + fine);
+                System.out.println(
+                        "Overdue: " + b.getMedia().getTitle() +
+                        " | Late: " + lateDays +
+                        " days | Fine added: " + fine
+                );
             }
         }
     }
 
-
     public List<Borrow> getBorrows() {
         return borrows;
+    }
+
+    
+    public void listBorrows(User user) {
+        boolean found = false;
+
+        for (Borrow b : borrows) {
+            if (b.getUser().equals(user)) {
+                System.out.println(b.getMedia().getTitle() + " | Due: " + b.getDueDate());
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No borrows for this user.");
+        }
     }
 
     public void listBorrows() {
@@ -76,27 +95,28 @@ public class BorrowManager {
         }
 
         for (Borrow b : borrows) {
-            System.out.println(b.getMedia().getType() + ": " + b.getMedia().getTitle() +
-                    " borrowed by " + b.getUser().getName() +
-                    " | Due: " + b.getDueDate());
+            System.out.println(
+                b.getMedia().getType() + ": " + b.getMedia().getTitle() +
+                " borrowed by " + b.getUser().getName() +
+                " | Due: " + b.getDueDate()
+            );
         }
     }
-
 
     public void payFine(User user, double amount) {
         user.payFine(amount);
     }
 
-   
     public List<User> getAllUsersWithOverdues() {
-        List<User> result = new ArrayList<>();
+        List<User> list = new ArrayList<>();
 
         for (Borrow b : borrows) {
-            if (b.isOverdue() && !result.contains(b.getUser())) {
-                result.add(b.getUser());
+            if (b.isOverdue() && !list.contains(b.getUser())) {
+                list.add(b.getUser());
             }
         }
-        return result;
+
+        return list;
     }
 
     public int countOverduesForUser(User user) {
@@ -107,6 +127,7 @@ public class BorrowManager {
                 count++;
             }
         }
+
         return count;
     }
 }

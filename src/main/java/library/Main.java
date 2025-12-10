@@ -1,5 +1,6 @@
 package library;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import library.admin.Admin;
@@ -9,6 +10,7 @@ import library.media.Media;
 import library.media.MediaManager;
 import library.borrow.BorrowManager;
 import library.users.User;
+import library.users.UserManager;
 
 public class Main {
 
@@ -16,112 +18,230 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
 
-        MediaManager mediaManager = new MediaManager();
-        BorrowManager borrowManager = new BorrowManager();
+       
+        ArrayList<Media> mediaList = StorageManager.loadMedia();
+        ArrayList<User> users = StorageManager.loadUsers();
 
-        Admin admin = new Admin("alaa", "1234");
-        User mainUser = new User("jana");
+        MediaManager mediaManager = new MediaManager(mediaList);
+        BorrowManager borrowManager = new BorrowManager();
+        UserManager userManager = new UserManager(users);
+
+        User loggedInUser = null;
+
+        Admin admin = new Admin(
+                Config.get("ADMIN_USERNAME"),
+                Config.get("ADMIN_PASSWORD")
+        );
 
         boolean exit = false;
-
         System.out.println("=== Welcome to the Library System ===");
 
         while (!exit) {
 
-            System.out.println("\nChoose an option:");
-            System.out.println("1. Admin Login");
-            System.out.println("2. Admin Logout");
-            System.out.println("3. Add Book (Admin Only)");
-            System.out.println("4. Add CD (Admin Only)");
-            System.out.println("5. List All Media");
-            System.out.println("6. Search Media");
-            System.out.println("7. Borrow Media");
-            System.out.println("8. Check Overdue Items");
-            System.out.println("9. Pay Fine");
-            System.out.println("10. Exit");
-
+            System.out.println("\nLogin as:");
+            System.out.println("1. Admin");
+            System.out.println("2. User");
+            System.out.println("3. Exit");
             System.out.print("Your choice: ");
-            String choice = sc.nextLine();
 
-            switch (choice) {
+            String role = sc.nextLine();
 
-                case "1":
-                    System.out.print("Enter username: ");
-                    String username = sc.nextLine();
-                    System.out.print("Enter password: ");
-                    String password = sc.nextLine();
-                    admin.login(username, password);
+            switch (role) {
+
+            
+            case "1":
+                System.out.print("Admin Username: ");
+                String aUser = sc.nextLine();
+                System.out.print("Admin Password: ");
+                String aPass = sc.nextLine();
+
+                admin.login(aUser, aPass);
+
+                if (!admin.isLoggedIn()) {
+                    System.out.println("❌ Invalid admin credentials");
                     break;
+                }
 
-                case "2":
-                    admin.logout();
-                    break;
+                boolean adminExit = false;
+                while (!adminExit) {
 
-                case "3":
-                    if (!admin.isLoggedIn()) {
-                        System.out.println(" Admin only!");
-                    } else {
-                        System.out.print("Book Title: ");
-                        String title = sc.nextLine();
-                        System.out.print("Author: ");
-                        String author = sc.nextLine();
-                        System.out.print("ISBN: ");
-                        String isbn = sc.nextLine();
+                    System.out.println("\n--- ADMIN MENU ---");
+                    System.out.println("1. Add Book");
+                    System.out.println("2. Add CD");
+                    System.out.println("3. List Media");
+                    System.out.println("4. Search Media");
+                    System.out.println("5. Check Overdue Items");
+                    System.out.println("6. Unregister User");
+                    System.out.println("7. Logout");
+                    System.out.print("Your choice: ");
 
-                        mediaManager.addMedia(new Book(title, author, isbn));
+                    String ch = sc.nextLine();
+
+                    switch (ch) {
+
+                        case "1":
+                            System.out.print("Book Title: ");
+                            String title = sc.nextLine();
+                            System.out.print("Author: ");
+                            String author = sc.nextLine();
+                            System.out.print("ISBN: ");
+                            String isbn = sc.nextLine();
+
+                            mediaManager.addBook(new Book(title, author, isbn));
+
+                            // Save ALL media (books + CDs)
+                            StorageManager.saveMedia(mediaManager.getAllMedia());
+                            break;
+
+                        case "2":
+                            System.out.print("CD Title: ");
+                            String cdTitle = sc.nextLine();
+                            System.out.print("Serial: ");
+                            String serial = sc.nextLine();
+
+                            mediaManager.addCD(new CD(cdTitle, serial));
+                            StorageManager.saveMedia(mediaManager.getAllMedia());
+                            break;
+
+                        case "3":
+                            mediaManager.listMedia();
+                            break;
+
+                        case "4":
+                            System.out.print("Keyword: ");
+                            mediaManager.searchMedia(sc.nextLine());
+                            break;
+
+                        case "5":
+                            borrowManager.checkOverdue();
+                            break;
+
+                        case "6":
+                            System.out.print("Username to remove: ");
+                            String rmName = sc.nextLine();
+                            User toRemove = userManager.findUserByName(rmName);
+
+                            if (toRemove != null) {
+                                userManager.unregisterUser(admin, toRemove, borrowManager);
+                                StorageManager.saveUsers(userManager.getUsers());
+                            } else {
+                                System.out.println("User not found.");
+                            }
+                            break;
+
+                        case "7":
+                            admin.logout();
+                            adminExit = true;
+                            break;
+
+                        default:
+                            System.out.println("Invalid choice!");
                     }
-                    break;
+                }
+                break;
 
-                case "4":
-                    if (!admin.isLoggedIn()) {
-                        System.out.println(" Admin only!");
-                    } else {
-                        System.out.print("CD Title: ");
-                        String cdTitle = sc.nextLine();
-                        System.out.print("Serial Number: ");
-                        String serial = sc.nextLine();
+         
+            case "2":
 
-                        mediaManager.addMedia(new CD(cdTitle, serial));
+                System.out.println("1. Register");
+                System.out.println("2. Login");
+                System.out.print("Your choice: ");
+
+                String opt = sc.nextLine();
+
+                if (opt.equals("1")) {
+                    System.out.print("Name: ");
+                    String name = sc.nextLine();
+                    System.out.print("Password: ");
+                    String pass = sc.nextLine();
+                    System.out.print("Email: ");
+                    String email = sc.nextLine();
+
+                    User newUser = new User(name, pass, email);
+                    userManager.addUser(newUser);
+                    StorageManager.saveUsers(userManager.getUsers());
+
+                    System.out.println("Registration successful!");
+
+                } else if (opt.equals("2")) {
+
+                    System.out.print("Name: ");
+                    String name = sc.nextLine();
+                    System.out.print("Password: ");
+                    String pass = sc.nextLine();
+
+                    loggedInUser = userManager.findUserByName(name);
+
+                    if (loggedInUser == null || !loggedInUser.checkPassword(pass)) {
+                        System.out.println(" Invalid login.");
+                        break;
                     }
-                    break;
 
-                case "5":
-                    mediaManager.listMedia();
-                    break;
+                    boolean userExit = false;
 
-                case "6":
-                    System.out.print("Keyword: ");
-                    mediaManager.searchMedia(sc.nextLine());
-                    break;
+                    while (!userExit) {
 
-                case "7":
-                    System.out.print("Enter Media ID to borrow: ");
-                    Media m = mediaManager.findMediaById(sc.nextLine());
+                        System.out.println("\n--- USER MENU ---");
+                        System.out.println("1. Search Media");
+                        System.out.println("2. Borrow Media");
+                        System.out.println("3. Pay Fine");
+                        System.out.println("4. List My Borrows");
+                        System.out.println("5. Logout");
+                        System.out.print("Your choice: ");
 
-                    if (m != null) {
-                        borrowManager.borrowMedia(m, mainUser);
-                    } else {
-                        System.out.println(" Media not found!");
+                        String choice = sc.nextLine();
+
+                        switch (choice) {
+
+                            case "1":
+                                System.out.print("Keyword: ");
+                                mediaManager.searchMedia(sc.nextLine());
+                                break;
+
+                            case "2":
+                                System.out.print("Enter Media ID: ");
+                                String id = sc.nextLine();
+
+                                // FIX: rename variable to avoid conflict
+                                Media mediaItem = mediaManager.findMediaById(id);
+
+                                if (mediaItem != null) {
+                                    borrowManager.borrowMedia(mediaItem, loggedInUser);
+                                } else {
+                                    System.out.println("Media not found.");
+                                }
+                                break;
+
+                            case "3":
+                                System.out.println("Your fine: " + loggedInUser.getFineBalance());
+                                System.out.print("Enter amount: ");
+                                double amt = Double.parseDouble(sc.nextLine());
+                                borrowManager.payFine(loggedInUser, amt);
+                                StorageManager.saveUsers(userManager.getUsers());
+                                break;
+
+                            case "4":
+                                borrowManager.listBorrows();
+                                break;
+
+                            case "5":
+                                userExit = true;
+                                break;
+
+                            default:
+                                System.out.println("Invalid choice!");
+                        }
                     }
-                    break;
+                }
+                break;
 
-                case "8":
-                    borrowManager.checkOverdue();
-                    break;
+            case "3":
+                exit = true;
+                System.out.println("Goodbye!");
+                break;
 
-                case "9":
-                    System.out.print("Payment amount: ");
-                    double amount = Double.parseDouble(sc.nextLine());
-                    mainUser.payFine(amount);
-                    break;
-
-                case "10":
-                    exit = true;
-                    System.out.println("Goodbye!");
-                    break;
-
-                default:
-                    System.out.println("Invalid choice.");
+            default:
+                System.out.println("Invalid option.");
             }
         }
 

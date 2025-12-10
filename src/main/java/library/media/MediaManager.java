@@ -7,14 +7,28 @@ public class MediaManager {
 
     private List<Media> mediaList;
 
+    
     public MediaManager() {
         mediaList = new ArrayList<>();
     }
 
-    public void addMedia(Media media) {
-        mediaList.add(media);
-        System.out.println("Added: " + media.getTitle());
+  
+    public MediaManager(List<Media> mediaList) {
+        this.mediaList = mediaList;
     }
+
+    
+    public void addBook(Book book) {
+        mediaList.add(book);
+        System.out.println("Book added: " + book.getTitle());
+    }
+
+
+    public void addCD(CD cd) {
+        mediaList.add(cd);
+        System.out.println("CD added: " + cd.getTitle());
+    }
+
 
     public void listMedia() {
         if (mediaList.isEmpty()) {
@@ -27,17 +41,23 @@ public class MediaManager {
         }
     }
 
-    public boolean searchMedia(String keyword) {
+
+    public void searchMedia(String keyword) {
         boolean found = false;
+
         for (Media m : mediaList) {
             if (m.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
                 System.out.println(m);
                 found = true;
             }
         }
-        return found;
+
+        if (!found) {
+            System.out.println("No matching media found.");
+        }
     }
 
+   
     public Media findMediaById(String id) {
         for (Media m : mediaList) {
             if (m.getId().equalsIgnoreCase(id)) {
@@ -45,5 +65,10 @@ public class MediaManager {
             }
         }
         return null;
+    }
+
+   
+    public List<Media> getAllMedia() {
+        return mediaList;
     }
 }

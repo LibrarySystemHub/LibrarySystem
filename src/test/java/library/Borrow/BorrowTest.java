@@ -25,7 +25,7 @@ class BorrowTest {
         borrow = new Borrow(book, user);
     }
 
-    // Helper method to modify dueDate using reflection
+    
     private void setDueDate(Borrow b, LocalDate date) {
         try {
             Field field = Borrow.class.getDeclaredField("dueDate");
