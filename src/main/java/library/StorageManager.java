@@ -17,9 +17,7 @@ public class StorageManager {
     private static final String USERS_FILE = "data/users.txt";
     private static final String BORROWS_FILE = "data/borrows.txt";
 
-    // ================================
-    // MEDIA LOAD/SAVE
-    // ================================
+    
     public static ArrayList<Media> loadMedia() {
         ArrayList<Media> list = new ArrayList<>();
         File file = new File(MEDIA_FILE);
@@ -66,9 +64,7 @@ public class StorageManager {
     }
 
     
-    // ================================
-    // USERS LOAD/SAVE
-    // ================================
+
     public static ArrayList<User> loadUsers() {
         ArrayList<User> users = new ArrayList<>();
         File file = new File(USERS_FILE);
@@ -111,9 +107,7 @@ public class StorageManager {
     }
 
 
-    // ================================
-    // BORROWS LOAD/SAVE
-    // ================================
+ 
     public static ArrayList<Borrow> loadBorrows(List<Media> media, List<User> users) {
 
         ArrayList<Borrow> borrows = new ArrayList<>();

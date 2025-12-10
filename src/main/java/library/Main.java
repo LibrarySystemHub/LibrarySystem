@@ -89,7 +89,7 @@ public class Main {
 
                             mediaManager.addBook(new Book(title, author, isbn));
 
-                            // Save ALL media (books + CDs)
+                           
                             StorageManager.saveMedia(mediaManager.getAllMedia());
                             break;
 
