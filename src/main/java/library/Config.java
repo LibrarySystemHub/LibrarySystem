@@ -6,7 +6,6 @@ public class Config {
 	private static Dotenv dotenv;
 
     static {
-       
         File file = new File("./.env");
         dotenv = Dotenv.configure()
                        .directory(file.getParent())
