@@ -11,9 +11,20 @@ import library.media.MediaManager;
 import library.borrow.BorrowManager;
 import library.users.User;
 import library.users.UserManager;
-
+/**
+ * Main entry point for the Library System application.
+ * Demonstrates creating users, media, and borrow operations.
+ * 
+ * @author Alaa 
+ * @author Jana
+ * @version 1.0
+ */
 public class Main {
-
+	 /**
+     * Main method to run the Library System.
+     * 
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);

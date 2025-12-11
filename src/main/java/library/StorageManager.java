@@ -12,7 +12,15 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Handles storage and retrieval of media, users, and borrow records
+ * to/from text files.
+ * Provides methods to load and save data for persistence.
+ * 
+ * @author Alaa
+ * @author jana
+ * @version 1.0
+ */
 public class StorageManager {
 
    
@@ -20,7 +28,13 @@ public class StorageManager {
     private static Path usersFile = Path.of("data/users.txt");
     private static Path borrowsFile = Path.of("data/borrows.txt");
 
-    
+    /**
+     * Allows overriding default file paths for testing or custom storage.
+     * 
+     * @param media Path to media file
+     * @param users Path to users file
+     * @param borrows Path to borrows file
+     */
     public static void useCustomPaths(Path media, Path users, Path borrows) {
         mediaFile = media;
         usersFile = users;
@@ -28,7 +42,11 @@ public class StorageManager {
     }
 
    
-    
+    /** 
+     * Loads all media records from the media file.
+     * 
+     * @return list of Media objects
+     */
     public static ArrayList<Media> loadMedia() {
         ArrayList<Media> list = new ArrayList<>();
 
@@ -56,7 +74,11 @@ public class StorageManager {
         return list;
     }
 
-    
+    /** 
+     * Saves a list of media records to the media file.
+     * 
+     * @param media list of Media objects to save
+     */
     public static void saveMedia(List<Media> media) {
         try (BufferedWriter bw = Files.newBufferedWriter(mediaFile)) {
 
@@ -77,7 +99,11 @@ public class StorageManager {
         }
     }
 
-    
+    /**
+     * Loads all users from the users file.
+     * 
+     * @return list of User objects
+     */
     public static ArrayList<User> loadUsers() {
         ArrayList<User> users = new ArrayList<>();
 
@@ -108,7 +134,11 @@ public class StorageManager {
         return users;
     }
 
-    
+    /**
+     * Saves a list of users to the users file.
+     * 
+     * @param users list of User objects to save
+     */
     public static void saveUsers(List<User> users) {
         try (BufferedWriter bw = Files.newBufferedWriter(usersFile)) {
 
@@ -125,7 +155,14 @@ public class StorageManager {
         }
     }
 
-    
+
+    /**
+     * Loads borrow records from the borrows file, linking to existing users and media.
+     * 
+     * @param media list of Media objects to match
+     * @param users list of User objects to match
+     * @return list of Borrow objects
+     */
     public static ArrayList<Borrow> loadBorrows(List<Media> media, List<User> users) {
 
         ArrayList<Borrow> borrows = new ArrayList<>();
@@ -139,6 +176,8 @@ public class StorageManager {
 
                 String[] parts = line.split(";");
 
+                if (parts.length < 5) continue;
+                try {
                 String mediaId = parts[0];
                 String username = parts[1];
                 LocalDate borrowDate = LocalDate.parse(parts[2]);
@@ -155,6 +194,10 @@ public class StorageManager {
                     b.setReturned(returned);
                     borrows.add(b);
                 }
+                } catch (Exception e) {
+                   
+                    continue;
+                }
             }
 
         } catch (Exception e) {
@@ -164,7 +207,11 @@ public class StorageManager {
         return borrows;
     }
 
-    
+    /**
+     * Saves a list of borrows to the borrows file.
+     * 
+     * @param borrows list of Borrow objects to save
+     */
     public static void saveBorrows(List<Borrow> borrows) {
         try (BufferedWriter bw = Files.newBufferedWriter(borrowsFile)) {
 

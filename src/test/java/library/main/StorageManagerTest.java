@@ -134,7 +134,7 @@ class StorageManagerTest {
 
         Media m = new Book("Clean Code", "A", "978");
         User u = new User("jana", "p", "e");
-
+        u.addFine(0);
         List<Borrow> list = StorageManager.loadBorrows(List.of(m), List.of(u));
 
         assertEquals(1, list.size()); // Only valid entry is loaded
