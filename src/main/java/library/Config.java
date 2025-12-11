@@ -7,7 +7,7 @@ public class Config {
 
     static {
        
-        File file = new File("./.envv");
+        File file = new File("./.env");
         dotenv = Dotenv.configure()
                        .directory(file.getParent())
                        .filename(file.getName())
