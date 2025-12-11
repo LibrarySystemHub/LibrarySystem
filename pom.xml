@@ -13,8 +13,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.10.0</junit.version>
-    </properties>
-<properties>
+   
   <sonar.organization>librarysystemhub</sonar.organization>
 </properties>
     <dependencies>
