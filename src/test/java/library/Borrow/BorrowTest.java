@@ -61,4 +61,37 @@ class BorrowTest {
         borrow.setReturned(true);
         assertFalse(borrow.isOverdue());
     }
+    @Test
+    void testGetters() {
+        assertEquals(book, borrow.getMedia());
+        assertEquals(user, borrow.getUser());
+        assertEquals(false, borrow.isReturned());
+        assertEquals(LocalDate.now(), borrow.getBorrowDate());
+        assertEquals(LocalDate.now().plusDays(28), borrow.getDueDate());
+    }
+    @Test
+    void testSetReturned() {
+        borrow.setReturned(true);
+        assertTrue(borrow.isReturned());
+
+        borrow.setReturned(false);
+        assertFalse(borrow.isReturned());
+    }
+    @Test
+    void testSetBorrowDate() {
+        LocalDate customDate = LocalDate.of(2022, 1, 1);
+        borrow.setBorrowDate(customDate);
+        assertEquals(customDate, borrow.getBorrowDate());
+    }
+    @Test
+    void testSetDueDate() {
+        LocalDate customDue = LocalDate.of(2023, 5, 10);
+        borrow.setDueDate(customDue);
+        assertEquals(customDue, borrow.getDueDate());
+    }
+    @Test
+    void testIsOverdueWhenDueDateIsToday() {
+        setDueDate(borrow, LocalDate.now());
+        assertFalse(borrow.isOverdue());
+    }
 }

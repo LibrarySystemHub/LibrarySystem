@@ -1,13 +1,15 @@
 package library;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import java.io.File;
 
 public class Config {
-	private static Dotenv dotenv;
+
+    private static Dotenv dotenv;
 
     static {
-       
         File file = new File("./.env");
+
         dotenv = Dotenv.configure()
                        .directory(file.getParent())
                        .filename(file.getName())
@@ -17,5 +19,4 @@ public class Config {
     public static String get(String key) {
         return dotenv.get(key);
     }
-
 }

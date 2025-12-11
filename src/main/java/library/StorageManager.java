@@ -7,35 +7,48 @@ import library.users.User;
 import library.borrow.Borrow;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StorageManager {
 
-    private static final String MEDIA_FILE = "data/media.txt";
-    private static final String USERS_FILE = "data/users.txt";
-    private static final String BORROWS_FILE = "data/borrows.txt";
+   
+    private static Path mediaFile = Path.of("data/media.txt");
+    private static Path usersFile = Path.of("data/users.txt");
+    private static Path borrowsFile = Path.of("data/borrows.txt");
 
+    
+    public static void useCustomPaths(Path media, Path users, Path borrows) {
+        mediaFile = media;
+        usersFile = users;
+        borrowsFile = borrows;
+    }
+
+   
     
     public static ArrayList<Media> loadMedia() {
         ArrayList<Media> list = new ArrayList<>();
-        File file = new File(MEDIA_FILE);
-        if (!file.exists()) return list;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(MEDIA_FILE))) {
+        if (!Files.exists(mediaFile)) return list;
+
+        try (BufferedReader br = Files.newBufferedReader(mediaFile)) {
+
             String line;
             while ((line = br.readLine()) != null) {
 
                 String[] parts = line.split(";");
 
                 if (parts[0].equals("BOOK")) {
-                    list.add(new Book(parts[1], parts[2], parts[3])); // title, author, isbn
+                    list.add(new Book(parts[1], parts[2], parts[3]));
                 }
                 else if (parts[0].equals("CD")) {
-                    list.add(new CD(parts[1], parts[2])); // title, serial
+                    list.add(new CD(parts[1], parts[2]));
                 }
             }
+
         } catch (Exception e) {
             System.out.println("Error loading media: " + e.getMessage());
         }
@@ -43,18 +56,19 @@ public class StorageManager {
         return list;
     }
 
+    
     public static void saveMedia(List<Media> media) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(MEDIA_FILE))) {
+        try (BufferedWriter bw = Files.newBufferedWriter(mediaFile)) {
 
             for (Media m : media) {
-                if (m instanceof Book) {
-                    Book b = (Book) m;
+
+                if (m instanceof Book b) {
                     bw.write("BOOK;" + b.getTitle() + ";" + b.getAuthor() + ";" + b.getId());
-                } 
-                else if (m instanceof CD) {
-                    CD cd = (CD) m;
+                }
+                else if (m instanceof CD cd) {
                     bw.write("CD;" + cd.getTitle() + ";" + cd.getId());
                 }
+
                 bw.newLine();
             }
 
@@ -64,13 +78,13 @@ public class StorageManager {
     }
 
     
-
     public static ArrayList<User> loadUsers() {
         ArrayList<User> users = new ArrayList<>();
-        File file = new File(USERS_FILE);
-        if (!file.exists()) return users;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
+        if (!Files.exists(usersFile)) return users;
+
+        try (BufferedReader br = Files.newBufferedReader(usersFile)) {
+
             String line;
             while ((line = br.readLine()) != null) {
 
@@ -86,6 +100,7 @@ public class StorageManager {
 
                 users.add(user);
             }
+
         } catch (Exception e) {
             System.out.println("Error loading users: " + e.getMessage());
         }
@@ -93,11 +108,15 @@ public class StorageManager {
         return users;
     }
 
+    
     public static void saveUsers(List<User> users) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(USERS_FILE))) {
+        try (BufferedWriter bw = Files.newBufferedWriter(usersFile)) {
 
             for (User u : users) {
-                bw.write(u.getName() + ";" + u.getPassword() + ";" + u.getEmail() + ";" + u.getFineBalance());
+                bw.write(u.getName() + ";" +
+                        u.getPassword() + ";" +
+                        u.getEmail() + ";" +
+                        u.getFineBalance());
                 bw.newLine();
             }
 
@@ -106,15 +125,14 @@ public class StorageManager {
         }
     }
 
-
- 
+    
     public static ArrayList<Borrow> loadBorrows(List<Media> media, List<User> users) {
 
         ArrayList<Borrow> borrows = new ArrayList<>();
-        File file = new File(BORROWS_FILE);
-        if (!file.exists()) return borrows;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(BORROWS_FILE))) {
+        if (!Files.exists(borrowsFile)) return borrows;
+
+        try (BufferedReader br = Files.newBufferedReader(borrowsFile)) {
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -146,15 +164,16 @@ public class StorageManager {
         return borrows;
     }
 
+    
     public static void saveBorrows(List<Borrow> borrows) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(BORROWS_FILE))) {
+        try (BufferedWriter bw = Files.newBufferedWriter(borrowsFile)) {
 
             for (Borrow b : borrows) {
                 bw.write(b.getMedia().getId() + ";" +
-                         b.getUser().getName() + ";" +
-                         b.getBorrowDate() + ";" +
-                         b.getDueDate() + ";" +
-                         b.isReturned());
+                        b.getUser().getName() + ";" +
+                        b.getBorrowDate() + ";" +
+                        b.getDueDate() + ";" +
+                        b.isReturned());
                 bw.newLine();
             }
 

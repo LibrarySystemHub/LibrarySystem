@@ -2,6 +2,8 @@ package library.media;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -64,4 +66,44 @@ class MediaManagerTest {
         Media found = manager.findMediaById("any");
         assertNull(found);
     }
+    @Test
+    void testGetAllMedia() {
+        Book b = new Book("Clean Code", "Robert Martin", "9780132350884");
+        CD cd = new CD("Best Songs", "CD001");
+        manager.addBook(b);
+        manager.addCD(cd);
+
+        List<Media> list = manager.getAllMedia();
+        assertEquals(2, list.size());
+        assertTrue(list.contains(b));
+        assertTrue(list.contains(cd));
+    }
+    @Test
+    void testListMediaWhenEmpty() {
+        manager.listMedia(); 
+    }
+
+    @Test
+    void testListMediaWithItems() {
+        Book b = new Book("Clean Code", "Robert Martin", "9780132350884");
+        manager.addBook(b);
+        manager.listMedia(); 
+    }
+    @Test
+    void testSearchMediaFound() {
+        Book b = new Book("Clean Code", "Robert Martin", "9780132350884");
+        manager.addBook(b);
+        manager.searchMedia("clean"); 
+    }
+    @Test
+    void testSearchMediaNotFound() {
+        Book b = new Book("Clean Code", "Robert Martin", "9780132350884");
+        manager.addBook(b);
+        manager.searchMedia("java"); 
+    }
+    @Test
+    void testSearchMediaEmptyList() {
+        manager.searchMedia("anything"); 
+    }
+
 }

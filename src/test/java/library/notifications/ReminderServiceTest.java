@@ -15,8 +15,8 @@ class ReminderServiceTest {
     private BorrowManager borrowManager;
     private ReminderService reminderService;
     private EmailNotifier emailNotifier;
-
-    private User user;
+    private User user2;
+    private User user1;
 
     @BeforeEach
     void setUp() {
@@ -26,18 +26,52 @@ class ReminderServiceTest {
 
         reminderService.addObserver(emailNotifier);
 
-        user = new User("jana");
+        user1 = new User("jana");
+        user2 = new User("aya");
     }
 
     @Test
-    void testSendOverdueRemindersSendsCorrectMessage() {
-
-        when(borrowManager.getAllUsersWithOverdues()).thenReturn(List.of(user));
-        when(borrowManager.countOverduesForUser(user)).thenReturn(2);
+    void testSendOverdueRemindersSingleUser() {
+        when(borrowManager.getAllUsersWithOverdues()).thenReturn(List.of(user1));
+        when(borrowManager.countOverduesForUser(user1)).thenReturn(2);
 
         reminderService.sendOverdueReminders();
 
-        verify(emailNotifier).notify(user, "You have 2 overdue book(s).");
+        verify(emailNotifier).notify(user1, "You have 2 overdue book(s).");
+    }
+    @Test
+    void testSendOverdueRemindersMultipleUsers() {
+        when(borrowManager.getAllUsersWithOverdues()).thenReturn(List.of(user1, user2));
+        when(borrowManager.countOverduesForUser(user1)).thenReturn(1);
+        when(borrowManager.countOverduesForUser(user2)).thenReturn(3);
+
+        reminderService.sendOverdueReminders();
+
+        verify(emailNotifier).notify(user1, "You have 1 overdue book(s).");
+        verify(emailNotifier).notify(user2, "You have 3 overdue book(s).");
+    }
+    @Test
+    void testSendOverdueRemindersNoUser() {
+        when(borrowManager.getAllUsersWithOverdues()).thenReturn(List.of());
+
+        reminderService.sendOverdueReminders();
+
+        
+        verify(emailNotifier, never()).notify(any(User.class), anyString());
+    }
+    
+    @Test
+    void testSendOverdueRemindersMultipleObservers() {
+        EmailNotifier emailNotifier2 = mock(EmailNotifier.class);
+        reminderService.addObserver(emailNotifier2);
+
+        when(borrowManager.getAllUsersWithOverdues()).thenReturn(List.of(user1));
+        when(borrowManager.countOverduesForUser(user1)).thenReturn(2);
+
+        reminderService.sendOverdueReminders();
+
+        verify(emailNotifier).notify(user1, "You have 2 overdue book(s).");
+        verify(emailNotifier2).notify(user1, "You have 2 overdue book(s).");
     }
 }
 

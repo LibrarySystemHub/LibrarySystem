@@ -14,18 +14,15 @@ public class UserManager {
     private boolean testMode;
     public UserManager(List<User> users) {
     	this.users = users;
-    	testMode = false;
+    	
     }
-    public UserManager(boolean testMode) {
-        users = new ArrayList<>();
-        this.testMode = testMode;
-    }
+   
 
     public void addUser(User user) {
         users.add(user);
-        if (!testMode) {
+       
             StorageManager.saveUsers(users);
-        }
+        
     }
     public User findUserByName(String name) {
         for (User u : users) {
@@ -50,10 +47,10 @@ public class UserManager {
     	 boolean removed = users.remove(user);
          if (removed) {
              System.out.println("User " + user.getName() + " unregistered successfully.");
-             if (!testMode) {
+             
                  StorageManager.saveUsers(users);
                  StorageManager.saveBorrows(borrowManager.getBorrows());
-             }
+             
          } else {
              System.out.println("User not found.");
          }

@@ -23,7 +23,7 @@ public class Main {
         ArrayList<User> users = StorageManager.loadUsers();
 
         MediaManager mediaManager = new MediaManager(mediaList);
-        BorrowManager borrowManager = new BorrowManager();
+        BorrowManager borrowManager = new BorrowManager(users, mediaList);
         UserManager userManager = new UserManager(users);
 
         User loggedInUser = null;
@@ -58,7 +58,7 @@ public class Main {
                 admin.login(aUser, aPass);
 
                 if (!admin.isLoggedIn()) {
-                    System.out.println("❌ Invalid admin credentials");
+                    System.out.println("Invalid admin credentials");
                     break;
                 }
 
@@ -176,6 +176,7 @@ public class Main {
                         System.out.println(" Invalid login.");
                         break;
                     }
+                    System.out.println("Login successful! Welcome " + loggedInUser.getName() + ".");
 
                     boolean userExit = false;
 
@@ -202,7 +203,7 @@ public class Main {
                                 System.out.print("Enter Media ID: ");
                                 String id = sc.nextLine();
 
-                                // FIX: rename variable to avoid conflict
+                                
                                 Media mediaItem = mediaManager.findMediaById(id);
 
                                 if (mediaItem != null) {
@@ -221,7 +222,7 @@ public class Main {
                                 break;
 
                             case "4":
-                                borrowManager.listBorrows();
+                            	 borrowManager.listBorrows(loggedInUser);
                                 break;
 
                             case "5":

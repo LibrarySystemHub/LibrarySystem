@@ -2,31 +2,28 @@ package library.users;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterAll;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UserTest {
 
     private User user;
-
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
-    }
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         user = new User("jana");
+        System.setOut(new PrintStream(outContent));
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
+        System.setOut(originalOut);
     }
 
     @Test
@@ -55,9 +52,10 @@ class UserTest {
     }
 
     @Test
-    void testPayFineWhenNoFineKeepsZero() {
+    void testPayFineWhenNoFinePrintsMessage() {
         user.payFine(5.0);
         assertEquals(0.0, user.getFineBalance());
+        assertTrue(outContent.toString().contains("No fines to pay!"));
     }
 
     @Test
@@ -69,5 +67,47 @@ class UserTest {
     void testCannotBorrowWhenHasFine() {
         user.addFine(3.0);
         assertFalse(user.canBorrow());
+    }
+
+    @Test
+    void testCheckPasswordCorrect() {
+        User u = new User("ala", "pass123", "ala@mail.com");
+        assertTrue(u.checkPassword("pass123"));
+    }
+
+    @Test
+    void testCheckPasswordIncorrect() {
+        User u = new User("ala", "pass123", "ala@mail.com");
+        assertFalse(u.checkPassword("wrongpass"));
+    }
+
+    @Test
+    void testCheckPasswordNullPasswordField() {
+        User u = new User("ala");
+        assertFalse(u.checkPassword("anything"));
+    }
+
+    @Test
+    void testPayFineWithNegativeAmount() {
+        user.addFine(5.0);
+        user.payFine(-3.0);
+        assertEquals(5.0, user.getFineBalance());
+        assertTrue(outContent.toString().contains("Amount must be positive."));
+    }
+
+    @Test
+    void testPayFineWithZeroAmount() {
+        user.addFine(5.0);
+        user.payFine(0.0);
+        assertEquals(5.0, user.getFineBalance());
+        assertTrue(outContent.toString().contains("Amount must be positive."));
+    }
+
+    @Test
+    void testPayFineWhenBalanceZero() {
+        assertEquals(0.0, user.getFineBalance());
+        user.payFine(10.0);
+        assertEquals(0.0, user.getFineBalance());
+        assertTrue(outContent.toString().contains("No fines to pay!"));
     }
 }

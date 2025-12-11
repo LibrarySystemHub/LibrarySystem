@@ -5,20 +5,22 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import library.StorageManager;
 import library.fines.BookFineStrategy;
 import library.fines.CDFineStrategy;
 import library.fines.FineStrategy;
 import library.media.Media;
+import library.media.MediaManager;
 import library.users.User;
+import library.users.UserManager;
 
 public class BorrowManager {
 
     private List<Borrow> borrows;
 
-    public BorrowManager() {
-        borrows = new ArrayList<>();
+    public BorrowManager(List<User> users, List<Media> mediaList) {
+        borrows = StorageManager.loadBorrows(mediaList, users);
     }
-
     public void borrowMedia(Media media, User user) {
 
         if (!user.canBorrow()) {
@@ -36,6 +38,7 @@ public class BorrowManager {
 
         Borrow newBorrow = new Borrow(media, user);
         borrows.add(newBorrow);
+        StorageManager.saveBorrows(borrows);
 
         System.out.println(media.getTitle() + " borrowed. Due: " + newBorrow.getDueDate());
     }
