@@ -1,119 +1,125 @@
 package library.borrow;
 
-
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 import library.StorageManager;
-import library.books.Book;
+import library.fines.BookFineStrategy;
+import library.fines.CDFineStrategy;
+import library.fines.FineStrategy;
+import library.media.Media;
+import library.media.MediaManager;
 import library.users.User;
+import library.users.UserManager;
 
 public class BorrowManager {
 
-    private ArrayList<Borrow> borrows;
-    private List<User> users;
-    private boolean testMode;
+    private List<Borrow> borrows;
 
-    public BorrowManager(List<Book> books, List<User> users) {
-        borrows = StorageManager.loadBorrows(books, users); 
-        this.users = users;
-        testMode = false;
+    public BorrowManager(List<User> users, List<Media> mediaList) {
+        borrows = StorageManager.loadBorrows(mediaList, users);
     }
-    public BorrowManager(boolean testMode) {
-        borrows = new ArrayList<>();
-        this.testMode = testMode;
-    }
+    public void borrowMedia(Media media, User user) {
 
-    public void borrowBook(Book book, User user) {
         if (!user.canBorrow()) {
-            System.out.println("You have unpaid fines! Pay before borrowing.");
+            System.out.println("User has unpaid fines. Cannot borrow.");
             return;
         }
+
+   
         for (Borrow b : borrows) {
             if (b.getUser().equals(user) && b.isOverdue()) {
-            	System.out.println("Cannot borrow: User has overdue books.");
-            	return;
+                System.out.println("Cannot borrow: user has overdue items.");
+                return;
             }
         }
 
-        Borrow newBorrow = new Borrow(book, user);
+        Borrow newBorrow = new Borrow(media, user);
         borrows.add(newBorrow);
-        if (!testMode) {
-            StorageManager.saveBorrows(borrows);
-        }
-        System.out.println("Book borrowed successfully. Due on: " + newBorrow.getDueDate());
-    }
-    public void returnBook(Borrow borrow) {
-        borrow.setReturned(true);
-        
-        if (!testMode) {
-            StorageManager.saveBorrows(borrows);
-        }
-        System.out.println("Book returned successfully: " + borrow.getBook().getTitle());
+        StorageManager.saveBorrows(borrows);
+
+        System.out.println(media.getTitle() + " borrowed. Due: " + newBorrow.getDueDate());
     }
 
-    public void checkOverdueBooks() {
-        boolean found = false;
+    public void checkOverdue() {
 
         for (Borrow b : borrows) {
+
             if (b.isOverdue()) {
-                found = true;
-                double fineAddedToday = 0;
-                LocalDate today = LocalDate.now();
-                if (b.getLastFineChecked().isBefore(today)) {
-                    fineAddedToday = b.calculateFine();
+
+                long lateDays = ChronoUnit.DAYS.between(b.getDueDate(), LocalDate.now());
+
+                FineStrategy strategy;
+
+                if (b.getMedia().getType().equals("CD")) {
+                    strategy = new CDFineStrategy();
+                } else {
+                    strategy = new BookFineStrategy();
                 }
-                System.out.println("User: " + b.getUser().getName() +
-                        " | Overdue: " + b.getBook().getTitle() +
-                        " | Fine added today: " + fineAddedToday +
-                        " | Total fine: " + b.getUser().getFineBalance());
-               
+
+                double fine = strategy.calculateFine(lateDays);
+                b.getUser().addFine(fine);
+
+                System.out.println(
+                        "Overdue: " + b.getMedia().getTitle() +
+                        " | Late: " + lateDays +
+                        " days | Fine added: " + fine
+                );
             }
         }
-
-        if (!found) System.out.println("No overdue books.");
-        if (!testMode) {
-        	 StorageManager.saveUsers(users);
-            StorageManager.saveBorrows(borrows);
-        }
-    }
-
-    public void payFine(User user, double amount) {
-        user.payFine(amount);
-        if (!testMode) {
-        	
-        	StorageManager.saveUsers(users);
-        }
-    }
-
-    public void listBorrows(User user) {
-    	  boolean found = false;
-    	    for (Borrow b : borrows) {
-    	        if (b.getUser().equals(user)) {
-    	            System.out.println(b);
-    	            found = true;
-    	        }
-    	    }
-    	    if (!found) {
-    	        System.out.println("No borrowed books yet.");
-    	    }
     }
 
     public List<Borrow> getBorrows() {
         return borrows;
     }
 
-    public List<User> getAllUsersWithOverdues() {
-        List<User> users = new ArrayList<>();
+    
+    public void listBorrows(User user) {
+        boolean found = false;
 
         for (Borrow b : borrows) {
-            if (b.isOverdue() && !users.contains(b.getUser())) {
-                users.add(b.getUser());
+            if (b.getUser().equals(user)) {
+                System.out.println(b.getMedia().getTitle() + " | Due: " + b.getDueDate());
+                found = true;
             }
         }
 
-        return users;
+        if (!found) {
+            System.out.println("No borrows for this user.");
+        }
+    }
+
+    public void listBorrows() {
+        if (borrows.isEmpty()) {
+            System.out.println("No active borrows.");
+            return;
+        }
+
+        for (Borrow b : borrows) {
+            System.out.println(
+                b.getMedia().getType() + ": " + b.getMedia().getTitle() +
+                " borrowed by " + b.getUser().getName() +
+                " | Due: " + b.getDueDate()
+            );
+        }
+    }
+
+    public void payFine(User user, double amount) {
+        user.payFine(amount);
+    }
+
+    public List<User> getAllUsersWithOverdues() {
+        List<User> list = new ArrayList<>();
+
+        for (Borrow b : borrows) {
+            if (b.isOverdue() && !list.contains(b.getUser())) {
+                list.add(b.getUser());
+            }
+        }
+
+        return list;
     }
 
     public int countOverduesForUser(User user) {

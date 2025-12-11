@@ -46,6 +46,18 @@ class AdminTest {
 		 assertFalse(admin.isLoggedIn());
 
 	}
+	@Test
+	void testInitialLoggedInStateIsFalse() {
+	    Admin a = new Admin("Admin", "1234");
+	    assertFalse(a.isLoggedIn());
+	}
+
+	@Test
+	void testLogoutWithoutLogin() {
+	    Admin a = new Admin("Admin", "1234");
+	    a.logout(); 
+	    assertFalse(a.isLoggedIn());
+	}
 	
 	
 
