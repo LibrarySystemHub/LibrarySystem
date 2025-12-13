@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 /**
  * Handles storage and retrieval of media, users, and borrow records
  * to/from text files.
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class StorageManager {
 
-   
+   private static final Logger logger = Logger.getLogger(StorageManager.class.getName());
     private static Path mediaFile = Path.of("data/media.txt");
     private static Path usersFile = Path.of("data/users.txt");
     private static Path borrowsFile = Path.of("data/borrows.txt");
@@ -68,7 +69,7 @@ public class StorageManager {
             }
 
         } catch (Exception e) {
-            System.out.println("Error loading media: " + e.getMessage());
+            logger.severe("Error loading media: " + e.getMessage());
         }
 
         return list;
@@ -95,7 +96,7 @@ public class StorageManager {
             }
 
         } catch (Exception e) {
-            System.out.println("Error saving media: " + e.getMessage());
+            logger.severe("Error saving media: " + e.getMessage());
         }
     }
 
@@ -128,7 +129,7 @@ public class StorageManager {
             }
 
         } catch (Exception e) {
-            System.out.println("Error loading users: " + e.getMessage());
+            logger.severe("Error loading users: " + e.getMessage());
         }
 
         return users;
@@ -151,7 +152,7 @@ public class StorageManager {
             }
 
         } catch (Exception e) {
-            System.out.println("Error saving users: " + e.getMessage());
+            logger.severe("Error saving users: " + e.getMessage());
         }
     }
 
@@ -201,7 +202,7 @@ public class StorageManager {
             }
 
         } catch (Exception e) {
-            System.out.println("Error loading borrows: " + e.getMessage());
+            logger.severe("Error loading borrows: " + e.getMessage());
         }
 
         return borrows;
@@ -225,7 +226,7 @@ public class StorageManager {
             }
 
         } catch (Exception e) {
-            System.out.println("Error saving borrows: " + e.getMessage());
+            logger.severe("Error saving borrows: " + e.getMessage());
         }
     }
 }
