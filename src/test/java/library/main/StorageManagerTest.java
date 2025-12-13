@@ -180,10 +180,10 @@ class StorageManagerTest {
     }
 
     @Test
-    void testLoadUsersInvalidLine() throws IOException {
-        Files.writeString(usersFile, "invalid;line\nalaa;123;a@mail;5");
-        List<User> loaded = StorageManager.loadUsers();
-        assertEquals(1, loaded.size());
-        assertEquals("alaa", loaded.get(0).getName());
-    }
+void testLoadUsersInvalidLine() throws IOException {
+    Files.writeString(usersFile, "invalid;line\nalaa;123;a@mail;10");
+    List<User> loaded = StorageManager.loadUsers();
+    assertEquals(1, loaded.size());
+    assertEquals("alaa", loaded.get(0).getName());
+}
 }
