@@ -19,17 +19,23 @@ public class Config {
         }
     }
 
-    public static String get(String key) {
+  public static String get(String key) {
 
-        String value = System.getenv(key);
-        if (value != null) {
-            return value;
-        }
-
-        if (dotenv != null) {
-            return dotenv.get(key);
-        }
-
-        return null;
+    String value = System.getenv(key);
+    if (value != null) {
+        return value;
     }
+
+    value = System.getProperty(key);
+    if (value != null) {
+        return value;
+    }
+
+    if (dotenv != null) {
+        return dotenv.get(key);
+    }
+
+    return null;
+}
+
 }
