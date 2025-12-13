@@ -164,4 +164,26 @@ class StorageManagerTest {
         List<Media> loaded = StorageManager.loadMedia();
         assertEquals(1, loaded.size());
     }
+      @Test
+    void testLoadMediaFileNotExist() throws IOException {
+        Files.deleteIfExists(mediaFile);
+        List<Media> loaded = StorageManager.loadMedia();
+        assertTrue(loaded.isEmpty());
+    }
+
+    @Test
+    void testSaveMediaInvalidPath() throws IOException {
+        Path invalidPath = Path.of("/invalid/path/media.txt");
+        StorageManager.useCustomPaths(invalidPath, usersFile, borrowsFile);
+        List<Media> mediaList = List.of(new Book("T", "A", "ID"));
+        assertDoesNotThrow(() -> StorageManager.saveMedia(mediaList));
+    }
+
+    @Test
+    void testLoadUsersInvalidLine() throws IOException {
+        Files.writeString(usersFile, "invalid;line\nalaa;123;a@mail;5");
+        List<User> loaded = StorageManager.loadUsers();
+        assertEquals(1, loaded.size());
+        assertEquals("alaa", loaded.get(0).getName());
+    }
 }
