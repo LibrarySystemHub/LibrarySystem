@@ -11,7 +11,7 @@ import library.fines.CDFineStrategy;
 import library.fines.FineStrategy;
 import library.media.Media;
 import library.users.User;
-
+import java.util.logging.Logger;
 /**
  * Manages borrow operations in the library, including borrowing media,
  * checking overdue items, calculating fines, and listing borrows.
@@ -21,7 +21,7 @@ import library.users.User;
  * @version 1.0
  */
 public class BorrowManager {
-
+private static final Logger logger = Logger.getLogger(BorrowManager.class.getName());
     private List<Borrow> borrows;
 
     /**
@@ -44,14 +44,14 @@ public class BorrowManager {
     public void borrowMedia(Media media, User user) {
 
         if (!user.canBorrow()) {
-            System.out.println("User has unpaid fines. Cannot borrow.");
+            logger.warning("User has unpaid fines. Cannot borrow.");
             return;
         }
 
    
         for (Borrow b : borrows) {
             if (b.getUser().equals(user) && b.isOverdue()) {
-                System.out.println("Cannot borrow: user has overdue items.");
+                logger.warning("Cannot borrow: user has overdue items.");
                 return;
             }
         }
@@ -60,7 +60,7 @@ public class BorrowManager {
         borrows.add(newBorrow);
         StorageManager.saveBorrows(borrows);
 
-        System.out.println(media.getTitle() + " borrowed. Due: " + newBorrow.getDueDate());
+        logger.info(media.getTitle() + " borrowed. Due: " + newBorrow.getDueDate());
     }
 
     /**
@@ -85,7 +85,7 @@ public class BorrowManager {
                 double fine = strategy.calculateFine(lateDays);
                 b.getUser().addFine(fine);
 
-                System.out.println(
+                logger.info(
                         "Overdue: " + b.getMedia().getTitle() +
                         " | Late: " + lateDays +
                         " days | Fine added: " + fine
@@ -109,13 +109,13 @@ public class BorrowManager {
 
         for (Borrow b : borrows) {
             if (b.getUser().equals(user)) {
-                System.out.println(b.getMedia().getTitle() + " | Due: " + b.getDueDate());
+                logger.info(b.getMedia().getTitle() + " | Due: " + b.getDueDate());
                 found = true;
             }
         }
 
         if (!found) {
-            System.out.println("No borrows for this user.");
+            logger.info("No borrows for this user.");
         }
     }
 
@@ -127,7 +127,7 @@ public class BorrowManager {
         }
 
         for (Borrow b : borrows) {
-            System.out.println(
+            logger.info(
                 b.getMedia().getType() + ": " + b.getMedia().getTitle() +
                 " borrowed by " + b.getUser().getName() +
                 " | Due: " + b.getDueDate()
