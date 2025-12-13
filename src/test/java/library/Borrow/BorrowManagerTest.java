@@ -189,4 +189,28 @@ class BorrowManagerTest {
         manager.borrowMedia(book, user);
         manager.listBorrows();
     }
+    @Test
+void testLoadMedia_FileNotExist() {
+    Path tempFile = Path.of("nonexistent.txt");
+    StorageManager.useCustomPaths(tempFile, Path.of(""), Path.of(""));
+    List<Media> list = StorageManager.loadMedia();
+    assertTrue(list.isEmpty());
+}
+
+@Test
+void testLoadUsers_FileNotExist() {
+    Path tempFile = Path.of("nonexistent.txt");
+    StorageManager.useCustomPaths(Path.of(""), tempFile, Path.of(""));
+    List<User> list = StorageManager.loadUsers();
+    assertTrue(list.isEmpty());
+}
+
+@Test
+void testLoadBorrows_FileNotExist() {
+    Path tempFile = Path.of("nonexistent.txt");
+    StorageManager.useCustomPaths(Path.of(""), Path.of(""), tempFile);
+    List<Borrow> list = StorageManager.loadBorrows(new ArrayList<>(), new ArrayList<>());
+    assertTrue(list.isEmpty());
+}
+
 }
