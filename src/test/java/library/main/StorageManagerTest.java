@@ -179,9 +179,9 @@ class StorageManagerTest {
         assertDoesNotThrow(() -> StorageManager.saveMedia(mediaList));
     }
 
-    @Test
+ @Test
 void testLoadUsersInvalidLine() throws IOException {
-    Files.writeString(usersFile, "invalid;line\nalaa;123;a@mail;10");
+    Files.writeString(usersFile, "invalid;line\nalaa;1234;a@mail.com;10");
     List<User> loaded = StorageManager.loadUsers();
     assertEquals(1, loaded.size());
     assertEquals("alaa", loaded.get(0).getName());
