@@ -1,4 +1,4 @@
-package library;
+/*package library;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -19,13 +19,13 @@ import library.users.UserManager;
  * @author Jana
  * @version 1.0
  */
-public class Main {
+//public class Main {
 	 /**
      * Main method to run the Library System.
      * 
      * @param args command line arguments
      */
-    public static void main(String[] args) {
+ /*   public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
 
@@ -260,3 +260,4 @@ public class Main {
         sc.close();
     }
 }
+*/
