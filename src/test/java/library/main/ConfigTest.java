@@ -29,4 +29,8 @@ class ConfigTest {
     void testGetInvalidKeyReturnsNull() {
         assertNull(Config.get("UNKNOWN_KEY"));
     }
+    @Test
+void testGetReturnsNullWhenKeyIsNull() {
+    assertNull(Config.get(null));
+}
 }
