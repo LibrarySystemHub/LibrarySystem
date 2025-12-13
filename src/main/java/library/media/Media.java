@@ -17,7 +17,7 @@ public abstract class Media {
      * @param title the title of the media
      * @param id    the unique identifier of the media
      */
-    public Media(String title, String id) {
+    protected Media(String title, String id) {
         this.title = title;
         this.id = id;
     }
