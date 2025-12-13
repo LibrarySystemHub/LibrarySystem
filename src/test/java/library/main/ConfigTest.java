@@ -33,4 +33,16 @@ class ConfigTest {
 void testGetUnknownKeyWithEnvAndDotenvPresentReturnsNull() {
     assertNull(Config.get("NOT_EXISTING_KEY_123"));
 }
+     @Test
+    void testGetWithDotenvNotNull() throws Exception {
+        Field dotenvField = Config.class.getDeclaredField("dotenv");
+        dotenvField.setAccessible(true);
+        Dotenv fakeDotenv = Dotenv.configure()
+                                   .ignoreIfMalformed()
+                                   .ignoreIfMissing()
+                                   .load();
+        dotenvField.set(null, fakeDotenv);
+        assertNull(Config.get("RANDOM_KEY_FOR_COVERAGE"));
+        dotenvField.set(null, null);
+    }
 }
