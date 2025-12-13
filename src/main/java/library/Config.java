@@ -12,15 +12,16 @@ import java.io.File;
  */
 public class Config {
 
-    private static Dotenv dotenv;
-
-    static {
+    try {
         File file = new File("./.env");
 
         dotenv = Dotenv.configure()
                        .directory(file.getParent())
                        .filename(file.getName())
                        .load();
+    } catch (Exception e) {
+        dotenv = null; 
+    }
     }
     /**
      * Retrieves the value of an environment variable from the .env file.
@@ -29,6 +30,14 @@ public class Config {
      * @return the value of the environment variable, or null if not found
      */
     public static String get(String key) {
+       String value = System.getenv(key);
+    if (value != null) {
+        return value;
+    }
+
+    
+    if (dotenv != null) {
         return dotenv.get(key);
+    }
     }
 }
