@@ -4,6 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.io.File;
 
 public class Config {
+    private Config() {}
 
     private static Dotenv dotenv;
 
