@@ -122,7 +122,7 @@ private static final Logger logger = Logger.getLogger(BorrowManager.class.getNam
     /** Lists all active borrows in the system. */
     public void listBorrows() {
         if (borrows.isEmpty()) {
-            System.out.println("No active borrows.");
+            logger.info("No active borrows.");
             return;
         }
 
