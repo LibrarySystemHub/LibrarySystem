@@ -16,7 +16,8 @@ import library.media.Book;
 import library.media.CD;
 import library.media.Media;
 import library.users.User;
-
+import java.nio.file.Path;
+import library.StorageManager;
 class BorrowManagerTest {
 
     private BorrowManager manager;
